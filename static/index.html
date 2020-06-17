@@ -94,8 +94,7 @@
                 // Create the table row
                 row = document.createElement("tr")
       
-                // Create the table data elements for the species and
-                // description columns
+                // Create the table data elements for person and present columns
                 person = document.createElement("td")
                 person.innerHTML = item.person
                 budget = document.createElement("td")
@@ -112,7 +111,7 @@
               })
             })
         
-        
+        // Add an adjecent table with a row for Total amount
         totalBudgetTable = document.querySelector("table")
         
         fetch("/totalbudget")
