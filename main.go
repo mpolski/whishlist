@@ -2,18 +2,16 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
-	"encoding/json"
+
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
-
-	
 )
 
 var store Store
-
 
 func main() {
 
@@ -46,6 +44,7 @@ func helloServer(w http.ResponseWriter, r *http.Request) {
 
 func newRouter() *mux.Router {
 	r := mux.NewRouter()
+
 	r.HandleFunc("/hello", helloServer).Methods("GET")
 	r.HandleFunc("/presents", GetPresentHandler).Methods("GET")
 	r.HandleFunc("/presents", CreatePresentHandler).Methods("POST")
@@ -53,13 +52,10 @@ func newRouter() *mux.Router {
 
 	staticFileDirectory := http.Dir("./static/")
 
-	staticFileHandler := http.StripPrefix("/static/", http.FileServer(staticFileDirectory))
-
-	r.PathPrefix("/static/").Handler(staticFileHandler).Methods("GET")
-
+	staticFileHandler := http.StripPrefix("/", http.FileServer(staticFileDirectory))
+	r.PathPrefix("/").Handler(staticFileHandler).Methods("GET")
 	return r
 }
-
 
 //Store functions to interact wtih DB
 func (store *dbStore) CreatePresent(present *Present) error {
@@ -164,7 +160,7 @@ func CreatePresentHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	http.Redirect(w, r, "/static/", http.StatusFound)
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 var presents []Present
