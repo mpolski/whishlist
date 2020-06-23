@@ -1,36 +1,3 @@
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: sc-nimble
-  labels:
-    app: whitelist
-provisioner: hpe.com/nimble
-parameters:
-  allowOverrides: importVol,forceImport,takeover,reverseRepl,description,perfPolicy
-  protectionTemplate: "test-protectiontemplate"
-  syncOnUnmount: "true"
-  destroyOnRm: "false"
-  perfPolicy: "SQL Server"
-  nameSuffix: ".whishlist"
-
-# See more parameters at https://scod.hpedev.io/flexvolume_driver/container_provider/#storageclass_parameters
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: whishlist-db-pvc-nimble
-  labels:
-    app: whitelist
-  annotations:
-    hpe.com/description: "My volume to be transitioned"
-    hpe.com/perfPolicy: "SQL Server"
-spec:
-  accessModes: [ "ReadWriteOnce" ]
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: sc-nimble 
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -47,7 +14,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgres-initdb-configi
+  name: postgres-initdb-config
   labels:
     app: whishlist
 data:
@@ -99,6 +66,8 @@ spec:
         configMap:
           name: postgres-initdb-config
       - name: data
-        persistentVolumeClaim:
-          claimName: whishlist-db-pvc-nimble 
+        hostPath: 
+          path: /tmp/data
+
+# hostPath : path referrs to an empty dir on the node (local host)
 
